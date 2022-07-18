@@ -20,8 +20,10 @@
 #include "COpenGLExtensionHandler.h"
 
 #include "guiengine/engine.hpp"
+#include "ge_main.hpp"
 #include "glad/gl.h"
 #include "ge_vulkan_driver.hpp"
+#include "ge_vulkan_scene_manager.hpp"
 #include "MoltenVK.h"
 
 extern bool GLContextDebugBit;
@@ -41,7 +43,7 @@ namespace irr
 #endif
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 		IVideoDriver* createVulkanDriver(const SIrrlichtCreationParameters& params,
-			io::IFileSystem* io, SDL_Window* win);
+			io::IFileSystem* io, SDL_Window* win, IrrlichtDevice* device);
 #endif
 	} // end namespace video
 
@@ -188,7 +190,12 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	createDriver();
 
 	if (VideoDriver)
-		createGUIAndScene();
+	{
+		if (CreationParams.DriverType == video::EDT_VULKAN)
+			createGUIAndVulkanScene();
+		else
+			createGUIAndScene();
+	}
 #ifdef IOS_STK
 	SDL_SetEventFilter(handle_app_event, NULL);
 #endif
@@ -330,6 +337,13 @@ extern "C" void update_swap_interval(int swap_interval)
 	if (swap_interval > 1)
 		swap_interval = 1;
 
+	GE::GEVulkanDriver* gevk = GE::getVKDriver();
+	if (gevk)
+	{
+		gevk->updateSwapInterval(swap_interval);
+		return;
+	}
+
 	// Try adaptive vsync first if support
 	if (swap_interval > 0)
 	{
@@ -389,6 +403,9 @@ bool CIrrDeviceSDL::createWindow()
 			return false;
 		}
 #endif
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+		SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
+#endif
 		flags |= SDL_WINDOW_VULKAN;
 	}
 
@@ -417,6 +434,10 @@ bool CIrrDeviceSDL::createWindow()
 		if (!Window)
 		{
 			os::Printer::log( "Could not initialize display!" );
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+			if (CreationParams.DriverType == video::EDT_VULKAN)
+				SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "0");
+#endif
 			return false;
 		}
 	}
@@ -622,10 +643,13 @@ void CIrrDeviceSDL::createDriver()
 		#ifdef _IRR_COMPILE_WITH_VULKAN_
 		try
 		{
-			VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, Window);
+			VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, Window, this);
 		}
 		catch (std::exception& e)
 		{
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+			SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "0");
+#endif
 			os::Printer::log("createVulkanDriver failed", e.what(), ELL_ERROR);
 		}
 		#else
@@ -899,6 +923,10 @@ bool CIrrDeviceSDL::run()
 				{
 					WindowHasFocus = true;
 					reset_network_body();
+#ifdef ANDROID
+					if (VideoDriver)
+						VideoDriver->unpauseRendering();
+#endif
 				}
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
 				{
@@ -1557,6 +1585,20 @@ s32 CIrrDeviceSDL::getRightPadding()
 #else
 	return RightPadding * getNativeScaleX();
 #endif
+}
+
+
+void CIrrDeviceSDL::createGUIAndVulkanScene()
+{
+	#ifdef _IRR_COMPILE_WITH_GUI_
+	// create gui environment
+	GUIEnvironment = gui::createGUIEnvironment(FileSystem, VideoDriver, Operator);
+	#endif
+
+	// create Scene manager
+	SceneManager = new GE::GEVulkanSceneManager(VideoDriver, FileSystem, CursorControl, GUIEnvironment);
+
+	setEventReceiver(UserReceiver);
 }
 
 

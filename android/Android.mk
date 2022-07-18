@@ -153,7 +153,8 @@ LOCAL_MODULE       := graphics_utils
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_utils/mipmap/*.c)
-LOCAL_CFLAGS       := -I../lib/graphics_utils/mipmap
+LOCAL_CFLAGS       := -I../lib/graphics_utils/mipmap \
+                      -I../lib/simd_wrapper
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 LOCAL_ARM_NEON     := false
 endif
@@ -168,12 +169,15 @@ LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_engine/src/*.c) \
                       $(wildcard ../lib/graphics_engine/src/*.cpp)
 LOCAL_CFLAGS       := -I../lib/graphics_engine/include \
+                      -I../lib/graphics_utils          \
                       -I../lib/sdl2/include/           \
                       -I../lib/irrlicht/include/
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 LOCAL_ARM_NEON     := false
 endif
+LOCAL_STATIC_LIBRARIES := shaderc
 include $(BUILD_STATIC_LIBRARY)
+$(call import-module, third_party/shaderc)
 include $(CLEAR_VARS)
 
 

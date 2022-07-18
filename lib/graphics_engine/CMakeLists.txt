@@ -1,4 +1,5 @@
 include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_engine/include")
+include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
 find_path(SDL2_INCLUDEDIR NAMES SDL.h PATH_SUFFIXES SDL2 include/SDL2 include PATHS)
 if (NOT SDL2_INCLUDEDIR)
@@ -22,12 +23,28 @@ endif()
 
 set(GE_SOURCES
     src/gl.c
+    src/ge_culling_tool.cpp
+    src/ge_dx9_texture.cpp
     src/ge_main.cpp
     src/ge_texture.cpp
-    src/ge_dx9_texture.cpp
+    src/ge_vma.cpp
+    src/ge_vulkan_2d_renderer.cpp
+    src/ge_vulkan_animated_mesh_scene_node.cpp
+    src/ge_vulkan_camera_scene_node.cpp
+    src/ge_vulkan_command_loader.cpp
+    src/ge_vulkan_depth_texture.cpp
     src/ge_vulkan_driver.cpp
+    src/ge_vulkan_draw_call.cpp
+    src/ge_vulkan_dynamic_buffer.cpp
+    src/ge_vulkan_features.cpp
+    src/ge_vulkan_mesh_cache.cpp
+    src/ge_vulkan_mesh_scene_node.cpp
+    src/ge_vulkan_scene_manager.cpp
+    src/ge_vulkan_shader_manager.cpp
     src/ge_vulkan_texture.cpp
+    src/ge_vulkan_texture_descriptor.cpp
     src/ge_gl_texture.cpp
+    src/ge_spm.cpp
 )
 
 if(NOT APPLE OR DLOPEN_MOLTENVK)

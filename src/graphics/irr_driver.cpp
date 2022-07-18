@@ -388,6 +388,9 @@ void IrrDriver::createListOfVideoModes()
  */
 void IrrDriver::initDevice()
 {
+#if !defined(SERVER_ONLY)
+    GE::setShaderFolder(file_manager->getShadersDir());
+#endif
     SIrrlichtCreationParameters params;
 
     video::E_DRIVER_TYPE driver_created = video::EDT_NULL;
@@ -502,6 +505,9 @@ void IrrDriver::initDevice()
         m_device->run();
         m_device->drop();
         m_device  = NULL;
+#if !defined(SERVER_ONLY)
+        GE::setVideoDriver(NULL);
+#endif
 
         params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device ||
             UserConfigParams::m_gamepad_visualisation);
@@ -596,7 +602,7 @@ void IrrDriver::initDevice()
     }
 #ifndef SERVER_ONLY 
 
-    GE::init(m_device->getVideoDriver());
+    GE::setVideoDriver(m_device->getVideoDriver());
     // Assume sp is supported
     CentralVideoSettings::m_supports_sp = true;
     CVS->init();
@@ -635,7 +641,7 @@ void IrrDriver::initDevice()
             Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
         }
 
-        GE::init(m_device->getVideoDriver());
+        GE::setVideoDriver(m_device->getVideoDriver());
         CVS->init();
     }
 #endif
