@@ -44,6 +44,7 @@
 #include "utils/constants.hpp"
 
 #include "irrMath.h"
+#include "karts/max_speed.hpp"
 #include <IAnimatedMeshSceneNode.h>
 
 /** Initialises the attachment each kart has.
@@ -459,8 +460,8 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         }
         else
         {
-            other->setSlowdown(MS_DECREASE_CHARGE, 0.1f, stk_config->time2Ticks(1f), 
-                             stk_config->time2Ticks(1f));
+            other->setSlowdown(MaxSpeed::MS_DECREASE_CHARGE, 0.1f,
+                               stk_config->time2Ticks(1.0f));
         }
     }
     else
