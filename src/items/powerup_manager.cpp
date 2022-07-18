@@ -110,7 +110,7 @@ PowerupManager::PowerupType
     static std::string powerup_names[] = {
         "",            /* Nothing */
         "bubblegum", "cake", "bowling", "zipper", "plunger", "switch",
-        "swatter", "rubber-ball", "parachute", "anchor"
+        "swatter", "rubber-ball", "charger", "parachute", "anchor"
     };
 
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
@@ -618,6 +618,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     {
         if (powerup == POWERUP_CAKE || powerup == POWERUP_RUBBERBALL)
             powerup = POWERUP_BOWLING;
+        if (powerup == POWERUP_CHARGER) powerup = POWERUP_ZIPPER;
     }
     return (PowerupType)powerup;
 }   // getRandomPowerup

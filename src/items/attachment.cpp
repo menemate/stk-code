@@ -450,6 +450,19 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         other->getAttachment()->clear();
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
     }
+    else if(getType()==Attachment::ATTACH_CHARGER)
+    {
+        if(other->isShielded())
+        {
+            other->decreaseShieldTime();
+            return;
+        }
+        else
+        {
+            other->setSlowdown(MS_DECREASE_CHARGE, 0.1f, stk_config->time2Ticks(1f), 
+                             stk_config->time2Ticks(1f));
+        }
+    }
     else
     {
         m_kart->playCustomSFX(SFXManager::CUSTOM_CRASH);
@@ -518,6 +531,8 @@ void Attachment::update(int ticks)
         // the model, Nolok's attachment type is ATTACH_SWATTER
         assert(false);
         break;
+    case ATTACH_CHARGER:
+        m_initial_speed = 0;
     case ATTACH_BOMB:
     {
         m_initial_speed = 0;

@@ -41,6 +41,7 @@ public:
            MS_INCREASE_RUBBER,
            MS_INCREASE_SKIDDING,
            MS_INCREASE_RED_SKIDDING,
+           MS_INCREASE_CHARGER,
            MS_INCREASE_MAX};
 
     /** The categories to use for decreasing the speed of a kart:
@@ -50,6 +51,7 @@ public:
           MS_DECREASE_AI,
           MS_DECREASE_BUBBLE,
           MS_DECREASE_SQUASH,
+          MS_DECREASE_CHARGE,
           MS_DECREASE_MAX};
 
 private:

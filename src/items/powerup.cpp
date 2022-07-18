@@ -319,6 +319,12 @@ void Powerup::use()
                       stk_config->time2Ticks(kp->getSwatterDuration()));
         break;
 
+    case PowerupManager::POWERUP_CHARGER:
+        m_kart->getAttachment()
+                ->set(Attachment::ATTACH_CHARGER,
+                      stk_config->time2Ticks(kp->getSwatterDuration()*0.7f));
+        break;
+
     case PowerupManager::POWERUP_BUBBLEGUM:
         // use the bubble gum the traditional way, if the kart is looking back
         if (m_kart->getControls().getLookBack())
